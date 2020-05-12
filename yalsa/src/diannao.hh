@@ -14,12 +14,12 @@ public:
   int numThreads = 1024; 
   // Other Hardware Paramters
   int mem_bw = 200; //GB/s
-  int L2_bytes = 4718592;
-  int comp_bw = 16; //iters /cycle
+  int L2_bytes = 4000000;
+  int comp_bw = 528; //iters /cycle
   float frequency = 1; //ghz
   float frequency_gpu = 1.46;
   float mem_bw_gpu = 653;
-  float comp_bw_gpu = min(64, numThreads);
+  float comp_bw_gpu = 5120;
   // Execution Time in seconds
   // This will be the maximum of:
   //   memory bound time & computation bound time
@@ -64,12 +64,12 @@ public:
     // This is how much we're slowing down the computation
     // as compared to the computation bound time
     float bw_ratio = total_gbps/mem_bw_gpu; 
-    printf("bw cache %f \n", bw);
+    // printf("bw cache %f \n", bw);
     
     float comp_bound_cycles = ln.iters_at_level(0) / comp_bw_gpu;
     float comp_bound_seconds = comp_bound_cycles / frequency_gpu;
     
-    printf("comp_bound_seconds %f \n", comp_bound_seconds);
+    // printf("comp_bound_seconds %f \n", comp_bound_seconds);
 
     float mem_bound_seconds = bw_ratio * comp_bound_seconds;
 
@@ -84,6 +84,12 @@ public:
     float total_flop_count =  ln.iters_at_level(0) * flops_per_iter;
     return total_flop_count / seconds;
   }
+
+ float mm_naive_exec_time(long int compute_peak_flops, long int memory_peak_bw, int datatype_bytes) {
+  float ideal_compute_time = 1e6* dims[VarN]*dims[VarK]*(2*dims[VarC] - 1) / compute_peak_flops;
+  float ideal_memory_time = 1e6* (dims[VarN]*dims[VarC] + dims[VarC]*dims[VarK])*datatype_bytes / memory_peak_bw;
+  return max(ideal_compute_time, ideal_memory_time);
+ } 
 };
 
 #endif

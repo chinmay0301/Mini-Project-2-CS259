@@ -80,13 +80,13 @@ void add_example_conv(std::vector<Loopnest>& lns) {
 
 }
 
-void add_example_mm(std::vector<Loopnest>& lns) {
+void add_example_mm(std::vector<Loopnest>& lns, int N) {
   Loopnest b;
   lns.push_back(b);
   Loopnest& ln = lns.back();
-  ln.dims[VarN]=64;
-  ln.dims[VarC]=256;
-  ln.dims[VarK]=256;
+  ln.dims[VarN]=N;
+  ln.dims[VarC]=4096;
+  ln.dims[VarK]=1024;
 
   Array array_a = Array("a",{{VarN},{VarC}});
   Array array_b = Array("b",{{VarC},{VarK}});
@@ -97,16 +97,16 @@ void add_example_mm(std::vector<Loopnest>& lns) {
   ln.arrays.push_back(array_c);
 
 
-  int Tn=32;
-  int Tc=32;
-  int Tk=32;
+  int Tn = 64;
+  int Tc = 128;
+  int Tk = 128;
 
   ln.loops.emplace_back(VarN,ln.dims[VarN]);
   ln.loops.emplace_back(VarC,ln.dims[VarC]);
   ln.loops.emplace_back(VarK,ln.dims[VarK]);
-  // ln.loops.emplace_back(VarN,Tn);
-  // ln.loops.emplace_back(VarC,Tc);
-  // ln.loops.emplace_back(VarK,Tk);
+  ln.loops.emplace_back(VarN,Tn);
+  ln.loops.emplace_back(VarC,Tc);
+  ln.loops.emplace_back(VarK,Tk);
 }
 
 
@@ -115,35 +115,41 @@ int main(int argc, char* argv[]) {
  
   DianNao diannao_model;
 
-  std::vector<Loopnest> lns;
-  add_example_conv(lns);
-  add_example_mm(lns);
+  // std::vector<Loopnest> lns;
+  // add_example_conv(lns);
+  // add_example_mm(lns);
 
-  // Do some basic analysis on each:
-  printf("\n");
-  printf(" ----- Example Conv Analysis ----- \n");
-  lns[0].print_volume_analysis();
-  lns[0].print_bandwidth_analysis();
+  // // Do some basic analysis on each:
+  // printf("\n");
+  // printf(" ----- Example Conv Analysis ----- \n");
+  // lns[0].print_volume_analysis();
+  // lns[0].print_bandwidth_analysis();
 
-  float flops = 
-  diannao_model.get_flops(lns[0],&lns[0].arrays[0],
-                                 &lns[0].arrays[1],
-                                 &lns[0].arrays[2]);
-  printf("DianNao Flops %f\n", flops);
+  // float flops = 
+  // diannao_model.get_flops(lns[0],&lns[0].arrays[0],
+  //                                &lns[0].arrays[1],
+  //                                &lns[0].arrays[2]);
+  // printf("DianNao Flops %f\n", flops);
 
-  printf("\n");
-  printf(" ----- Example MM Analysis ----- \n");
-  lns[1].print_volume_analysis();
-  lns[1].print_bandwidth_analysis();
+  // printf("\n");
+  // printf(" ----- Example MM Analysis ----- \n");
+  // lns[1].print_volume_analysis();
+  // lns[1].print_bandwidth_analysis();
 
-  float time = 
-  diannao_model.get_exec_time(lns[1],&lns[1].arrays[0],
-                                 &lns[1].arrays[1],
-                                 &lns[1].arrays[2]);
-  printf("DianNao Flops %f us\n", time);
+  // float time = 
+  // diannao_model.get_exec_time(lns[1],&lns[1].arrays[0],
+  //                                &lns[1].arrays[1],
+  //                                &lns[1].arrays[2]);
+  // printf("DianNao Flops %f us\n", time);
 
-  float gpu_exec_time = diannao_model.get_gpu_exec_time(lns[1]);
-  printf("GPU execution time %f us\n", gpu_exec_time);
+  for (int i =1; i<1024; i*=2){
+    std::vector<Loopnest> lns;
+    add_example_mm(lns,i);
+    float gpu_exec_time = diannao_model.get_gpu_exec_time(lns[0]);
+    printf("i: %d \t GPU execution time %f us\n", i,gpu_exec_time);
+  }
+  // float gpu_exec_time = diannao_model.get_gpu_exec_time(lns[1]);
+  // printf("GPU execution time %f us\n", gpu_exec_time);
 
   return 0;
 }

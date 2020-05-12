@@ -151,5 +151,11 @@ void Loopnest::print_bandwidth_analysis() {
   }
 }
 
+float Loopnest::mm_naive_exec_time(long int compute_peak_flops, long int memory_peak_bw, int datatype_bytes) {
+  float ideal_compute_time = 1e6* dims[VarN]*dims[VarK]*(2*dims[VarC] - 1) / compute_peak_flops;
+  float ideal_memory_time = 1e6* (dims[VarN]*dims[VarC] + dims[VarC]*dims[VarK])*datatype_bytes / memory_peak_bw;
+  return max(ideal_compute_time, ideal_memory_time);
+ } 
+
 
 
