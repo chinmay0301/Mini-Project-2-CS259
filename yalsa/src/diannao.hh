@@ -11,12 +11,15 @@ public:
   int synapse_bytes=16*16*2*64; //bytes
   int neuron_in_bytes=16*2*64;
   int neuron_out_bytes=16*2*64;
-
+  int numThreads = 1024; 
   // Other Hardware Paramters
-  int mem_bw=200; //GB/s
-  int comp_bw=16*16; //iters /cycle
+  int mem_bw = 200; //GB/s
+  int L2_bytes = 4718592;
+  int comp_bw = 16; //iters /cycle
   float frequency = 1; //ghz
-
+  float frequency_gpu = 1.46;
+  float mem_bw_gpu = 653;
+  float comp_bw_gpu = min(64, numThreads);
   // Execution Time in seconds
   // This will be the maximum of:
   //   memory bound time & computation bound time
@@ -44,7 +47,34 @@ public:
     float mem_bound_seconds = bw_ratio * comp_bound_seconds;
 
     // Take the max of computation bound and memory bound time
-    return max(comp_bound_seconds,mem_bound_seconds);
+    return max(comp_bound_seconds,mem_bound_seconds)/1000;
+  }
+
+  float get_gpu_exec_time(Loopnest& ln) {
+    int lvl;
+
+    // Each one of the following contributes to total memory
+    // bandwidth:
+    float bw = ln.bandwidth_for_cache(4, L2_bytes, comp_bw_gpu, lvl); // bytes / cycle
+  
+    // Convert to gb/s
+    float total_gbps = bw / (1024 * 1024 * 1024) * 
+                       frequency_gpu * 1000000000;
+    
+    // This is how much we're slowing down the computation
+    // as compared to the computation bound time
+    float bw_ratio = total_gbps/mem_bw_gpu; 
+    printf("bw cache %f \n", bw);
+    
+    float comp_bound_cycles = ln.iters_at_level(0) / comp_bw_gpu;
+    float comp_bound_seconds = comp_bound_cycles / frequency_gpu;
+    
+    printf("comp_bound_seconds %f \n", comp_bound_seconds);
+
+    float mem_bound_seconds = bw_ratio * comp_bound_seconds;
+
+    // Take the max of computation bound and memory bound time
+    return max(comp_bound_seconds,mem_bound_seconds)/1000;
   }
 
   // We can convert from execution time to flops

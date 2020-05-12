@@ -104,9 +104,9 @@ void add_example_mm(std::vector<Loopnest>& lns) {
   ln.loops.emplace_back(VarN,ln.dims[VarN]);
   ln.loops.emplace_back(VarC,ln.dims[VarC]);
   ln.loops.emplace_back(VarK,ln.dims[VarK]);
-  ln.loops.emplace_back(VarN,Tn);
-  ln.loops.emplace_back(VarC,Tc);
-  ln.loops.emplace_back(VarK,Tk);
+  // ln.loops.emplace_back(VarN,Tn);
+  // ln.loops.emplace_back(VarC,Tc);
+  // ln.loops.emplace_back(VarK,Tk);
 }
 
 
@@ -136,12 +136,14 @@ int main(int argc, char* argv[]) {
   lns[1].print_volume_analysis();
   lns[1].print_bandwidth_analysis();
 
-  flops = 
-  diannao_model.get_flops(lns[1],&lns[1].arrays[0],
+  float time = 
+  diannao_model.get_exec_time(lns[1],&lns[1].arrays[0],
                                  &lns[1].arrays[1],
                                  &lns[1].arrays[2]);
-  printf("DianNao Flops %f\n", flops);
+  printf("DianNao Flops %f us\n", time);
 
+  float gpu_exec_time = diannao_model.get_gpu_exec_time(lns[1]);
+  printf("GPU execution time %f us\n", gpu_exec_time);
 
   return 0;
 }
