@@ -65,16 +65,16 @@ public:
 
   void get_extent(std::vector<int>& extent, int start_loop_level);
   
-  int volume_at_level(Array& arr, int start_loop_level);
+  long int volume_at_level(Array& arr, int start_loop_level);
   
-  int iters_at_level(int start_loop_level);
+  long int iters_at_level(int start_loop_level);
   
   float bandwidth_for_cache(int datatype_bytes, int cache_bytes, int iters_per_cycle, int & lvl);
   float bandwidth_for_scratchpad(Array* array,
       int datatype_bytes, int scratchpad_bytes, int iters_per_cycle, int & lvl);
 
   void print_volume_analysis();
-
+  float mm_naive_exec_time(long int compute_peak_flops, long int memory_peak_bw, int datatype_bytes);
   void print_bandwidth_analysis();
 
 };

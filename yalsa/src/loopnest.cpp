@@ -13,14 +13,14 @@ void Loopnest::get_extent(std::vector<int>& extent, int start_loop_level){
   }
 }
 
-int Loopnest::volume_at_level(Array& arr, int start_loop_level) {
+long int Loopnest::volume_at_level(Array& arr, int start_loop_level) {
   // compute the "extent" or range of each variable at this level of the loop nest
   // some redundant computation here, but oh well
   std::vector<int> extent;
   get_extent(extent,start_loop_level);
 
   // compute the volume at this level according to extents
-  int volume = 1;
+  long int volume = 1;
   for(std::vector<int>& arr_dim : arr.coupling) {
     int total_read=0;
     int total_added=0;
@@ -39,11 +39,11 @@ int Loopnest::volume_at_level(Array& arr, int start_loop_level) {
   return volume;
 }
 
-int Loopnest::iters_at_level(int start_loop_level) {
+long int Loopnest::iters_at_level(int start_loop_level) {
   std::vector<int> extent;
   get_extent(extent,start_loop_level);
 
-  int iters=1;
+  long int iters=1;
   for(int i = 0; i < extent.size(); i++) {
     iters*=extent[i];
   }
@@ -58,7 +58,7 @@ int Loopnest::iters_at_level(int start_loop_level) {
 float Loopnest::bandwidth_for_cache(int datatype_bytes, int cache_bytes, 
     int iters_per_cycle, int & lvl) {
 
-  int total_volume;   
+  long int total_volume;   
   
   for(lvl=0; lvl < loops.size(); ++lvl) {
     total_volume=0;
@@ -71,7 +71,7 @@ float Loopnest::bandwidth_for_cache(int datatype_bytes, int cache_bytes,
       break;
     }
   }
-  int iters = iters_at_level(lvl);
+  long int iters = iters_at_level(lvl);
 
   if(lvl == loops.size()) {
     total_volume=0;
@@ -93,7 +93,7 @@ float Loopnest::bandwidth_for_cache(int datatype_bytes, int cache_bytes,
 float Loopnest::bandwidth_for_scratchpad(Array* arr, int datatype_bytes, 
     int scratchpad_bytes, int iters_per_cycle, int & lvl) {
 
-  int total_volume;   
+  long int total_volume;   
   
   for(lvl=0; lvl < loops.size(); ++lvl) {
     total_volume = volume_at_level(*arr,lvl);
@@ -103,7 +103,7 @@ float Loopnest::bandwidth_for_scratchpad(Array* arr, int datatype_bytes,
       break;
     }
   }
-  int iters = iters_at_level(lvl);
+  long int iters = iters_at_level(lvl);
 
   if(lvl == loops.size()) {
     total_volume += volume_at_level(*arr,lvl);

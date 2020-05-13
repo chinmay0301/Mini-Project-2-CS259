@@ -97,16 +97,16 @@ void add_example_mm(std::vector<Loopnest>& lns, int N) {
   ln.arrays.push_back(array_c);
 
 
-  int Tn = 64;
-  int Tc = 128;
-  int Tk = 128;
-
-  ln.loops.emplace_back(VarN,ln.dims[VarN]);
+  int Tn = max(32,N);
+  int Tc = 64;
+  int Tk = 64;
+  
   ln.loops.emplace_back(VarC,ln.dims[VarC]);
   ln.loops.emplace_back(VarK,ln.dims[VarK]);
-  ln.loops.emplace_back(VarN,Tn);
+  ln.loops.emplace_back(VarN,ln.dims[VarN]);
   ln.loops.emplace_back(VarC,Tc);
   ln.loops.emplace_back(VarK,Tk);
+  ln.loops.emplace_back(VarN,Tn);
 }
 
 
@@ -146,7 +146,7 @@ int main(int argc, char* argv[]) {
     std::vector<Loopnest> lns;
     add_example_mm(lns,i);
     float gpu_exec_time = diannao_model.get_gpu_exec_time(lns[0]);
-    printf("i: %d \t GPU execution time %f us\n", i,gpu_exec_time);
+    printf("N: %d \t GPU model time %f us \t Naive model time \n", i,(8.0/7)*gpu_exec_time);
   }
   // float gpu_exec_time = diannao_model.get_gpu_exec_time(lns[1]);
   // printf("GPU execution time %f us\n", gpu_exec_time);
