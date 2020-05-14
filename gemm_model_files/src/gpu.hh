@@ -1,5 +1,5 @@
-#ifndef DIANNAO_H
-#define DIANNAO_H
+#ifndef GPU_H
+#define GPU_H
 
 #include "loopnest.hh"
 
