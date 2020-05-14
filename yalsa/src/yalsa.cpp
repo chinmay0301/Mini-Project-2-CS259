@@ -101,11 +101,6 @@ void add_example_mm(std::vector<Loopnest>& lns, int N) {
   int Tk = ln.dims[VarK]/16;
   int Tc = 4*Tk;  // ideally Tc is pow(2, int(log2(lin.dims[VarC]/lin.dims[VarK])))
   
-  // int Tn = max(32,N);
-  // int Tc = 64;
-  // int Tk = 64;
-
-
   ln.loops.emplace_back(VarN,ln.dims[VarN]);
   ln.loops.emplace_back(VarK,ln.dims[VarK]);
   ln.loops.emplace_back(VarC,ln.dims[VarC]);
@@ -117,41 +112,16 @@ void add_example_mm(std::vector<Loopnest>& lns, int N) {
 
 
 int main(int argc, char* argv[]) {
- 
-  DianNao diannao_model;
   GPU gpu_model;
-  // std::vector<Loopnest> lns;
-  // add_example_conv(lns);
-  // add_example_mm(lns);
 
-  // // Do some basic analysis on each:
-  // printf("\n");
-  // printf(" ----- Example Conv Analysis ----- \n");
-  // lns[0].print_volume_analysis();
-  // lns[0].print_bandwidth_analysis();
-
-  // float flops = 
-  // diannao_model.get_flops(lns[0],&lns[0].arrays[0],
-  //                                &lns[0].arrays[1],
-  //                                &lns[0].arrays[2]);
-  // printf("DianNao Flops %f\n", flops);
-
-  // printf("\n");
-  // printf(" ----- Example MM Analysis ----- \n");
-  // lns[1].print_volume_analysis();
-  // lns[1].print_bandwidth_analysis();
-
-  // float time = 
-  // diannao_model.get_exec_time(lns[1],&lns[1].arrays[0],
-  //                                &lns[1].arrays[1],
-  //                                &lns[1].arrays[2]);
-  // printf("DianNao Flops %f us\n", time);
   int i=1;
   float beta = 8.0 / 7;
-  while(i<25088){
+  while(i<1024){
     std::vector<Loopnest> lns;
     add_example_mm(lns,i);
-    float gpu_exec_time = gpu_model.get_gpu_exec_time(lns[0]);
+
+    // Change the second argument to 1 for printing the values for the get_gpu_exec_time function 
+    float gpu_exec_time = gpu_model.get_gpu_exec_time(lns[0], 0);
     float naive_time = lns[0].mm_naive_exec_time(14.9e12, 653e9, 4);
     printf("N:, %d, GPU_time, %f, Naive_time, %f, \n", i,beta*gpu_exec_time, naive_time);
     if(i<10){
@@ -163,8 +133,17 @@ int main(int argc, char* argv[]) {
       i*=2;
     }
   }
-  // float gpu_exec_time = diannao_model.get_gpu_exec_time(lns[1]);
-  // printf("GPU execution time %f us\n", gpu_exec_time);
+
+  // Architectural insight analysis
+  std::vector<Loopnest> lns;
+  
+  // Generating matrix with batch size 256
+  add_example_mm(lns,256);
+  // Print memory bandwidth analysis
+  gpu_model.mem_bw_analysis(lns[0]);
+  // Print compute bandwidth analysis
+  gpu_model.comp_bw_analysis(lns[0]);
+
 
   return 0;
 }
