@@ -120,10 +120,12 @@ int main(int argc, char* argv[]) {
     std::vector<Loopnest> lns;
     add_example_mm(lns,i);
 
-    // Change the second argument to 1 for printing the values for the get_gpu_exec_time function 
-    float gpu_exec_time = gpu_model.get_gpu_exec_time(lns[0], 0);
+    // Change the value of display to 1 for printing the values for the get_gpu_exec_time function 
+    int display = 0;
+    float gpu_exec_time = gpu_model.get_gpu_exec_time(lns[0], display);
     float naive_time = lns[0].mm_naive_exec_time(14.9e12, 653e9, 4);
-    printf("N:, %d, GPU_time, %f, Naive_time, %f, \n", i,beta*gpu_exec_time, naive_time);
+    if (display == 1)
+      printf("N:, %d, GPU_time, %f, Naive_time, %f, \n", i,beta*gpu_exec_time, naive_time);
     if(i<10){
       i++;
     }

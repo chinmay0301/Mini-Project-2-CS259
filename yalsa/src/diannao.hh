@@ -114,7 +114,7 @@ public:
     float l2_eff_bw = alpha*l2_bw_gpu + (1-alpha)*mem_bw_gpu;
     float bw_L2 = ln.bandwidth_for_cache(4, L2_bytes, comp_bw_gpu, lvl_l2);
     // Convert to gb/s
-    if(display)
+    if(display == 1)
     printf("bw_L1, %f, bw_L2, %f,", bw_L1, bw_L2);
     
     if(ln.dims[VarN]<=32){
@@ -131,7 +131,7 @@ public:
       bw_ratio = total_gbps/l2_bw_gpu;
     }
     
-    if (display)
+    if (display == 1)
     printf("bw_ratio, %f,",bw_ratio);
     long double comp_bound_cycles = ln.iters_at_level(0) / comp_bw_gpu;
     float comp_bound_seconds = comp_bound_cycles / (frequency_gpu*1000);
