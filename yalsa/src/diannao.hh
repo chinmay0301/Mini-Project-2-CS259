@@ -161,7 +161,7 @@ public:
     for (int i = low_lim; i<=up_lim; i++) {
       mem_bw_gpu = i;
       exec_time = get_gpu_exec_time(ln, 0);
-      printf("%f, %f\n", comp_bw_gpu, exec_time);
+      printf("%f, %f\n", mem_bw_gpu, exec_time);
     }
 
   }  

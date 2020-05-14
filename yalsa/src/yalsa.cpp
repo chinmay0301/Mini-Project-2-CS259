@@ -140,11 +140,11 @@ int main(int argc, char* argv[]) {
   std::vector<Loopnest> lns;
   
   // Generating matrix with batch size 256
-  add_example_mm(lns,256);
+  add_example_mm(lns,4);
   // Print memory bandwidth analysis
   gpu_model.mem_bw_analysis(lns[0]);
   // Print compute bandwidth analysis
-  gpu_model.comp_bw_analysis(lns[0]);
+  // gpu_model.comp_bw_analysis(lns[0]);
 
 
   return 0;
